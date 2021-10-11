@@ -41,8 +41,8 @@ class MainActivity : AppCompatActivity() {
         if (n == 1) {
             return false;
         }
-        var sqrt: Int = (sqrt(n as Float) as Int) + 1;
-        for (i in (2 until sqrt)) {
+        var nSqrt: Int = (sqrt(n.toFloat()).toInt()) + 1;
+        for (i in (2 until nSqrt)) {
             if ((n % i) == 0) { // dividable
                 return false;
             }
