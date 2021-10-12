@@ -1,5 +1,6 @@
 package com.example.hellokotlin
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -16,6 +17,7 @@ class MainActivity : AppCompatActivity() {
         var inputNumber: EditText = findViewById(R.id.inputNumber);
         var result: TextView = findViewById(R.id.txtResult);
         var btnCalc: Button = findViewById(R.id.btnCalc);
+        var btnNext: Button = findViewById(R.id.btnNext);
 
         // calc
         result.text = "it worked";
@@ -35,9 +37,18 @@ class MainActivity : AppCompatActivity() {
                 result.text = num.toString() + "は素数でない";
             }
         }
+
+        btnNext.setOnClickListener {
+            startSoundActivity();
+        }
     }
 
-    fun isPrime(n: Int): Boolean {
+    private fun startSoundActivity() {
+        val nextIntent = Intent(this, SoundActivity::class.java);
+        startActivity(nextIntent);
+    }
+
+    private fun isPrime(n: Int): Boolean {
         if (n == 1) {
             return false;
         }
