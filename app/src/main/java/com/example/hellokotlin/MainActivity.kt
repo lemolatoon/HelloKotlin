@@ -26,7 +26,11 @@ class MainActivity : AppCompatActivity() {
             result.text = "calculating...";
             var text = inputNumber.text;
             System.out.println(text);
-            var num = text.toString().toInt();
+            var num = if (text.toString() != "") {
+                text.toString().toInt()
+            } else {
+                0
+            };
             System.out.println(num);
             result.text = text;
             if (num == 0) {
