@@ -112,4 +112,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btnAddF"
         app:layout_constraintTop_toBottomOf="@+id/txtFrequency" />
+
+    <EditText
+        android:id="@+id/numA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="70dp"
+        android:ems="10"
+        android:inputType="numberSigned"
+        app:layout_constraintBottom_toTopOf="@+id/fInput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/numB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:ems="10"
+        android:inputType="numberSigned"
+        app:layout_constraintBottom_toTopOf="@+id/fInput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/numA" />
 </androidx.constraintlayout.widget.ConstraintLayout>

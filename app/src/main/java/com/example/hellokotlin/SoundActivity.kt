@@ -6,10 +6,12 @@ import android.media.AudioManager
 import android.media.AudioTrack
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Half.abs
 import android.widget.Button
 import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
+import java.lang.Exception
 
 class SoundActivity : AppCompatActivity() {
 
@@ -36,6 +38,8 @@ class SoundActivity : AppCompatActivity() {
         val btnBack: Button = findViewById(R.id.btnBack);
         seekBarF = findViewById(R.id.seekBarF);
         val txtFrequency: TextView = findViewById(R.id.txtFrequency);
+        val numA: EditText = findViewById(R.id.numA);
+        val numB: EditText = findViewById(R.id.numB);
         seekBarF.progress = 0;
         seekBarF.max = 1000;
 
@@ -87,14 +91,37 @@ class SoundActivity : AppCompatActivity() {
         }
 
         btnBack.setOnClickListener {
-            startPreviousActivity();
+            startNextActivity();
+            //  not used
+//            val fragment = InputWaveFragment();
+//            val transaction = supportFragmentManager.beginTransaction();
+//            transaction.add(R.id.layout, fragment);
+//            transaction.commit();
         }
 
         btnPlay.setOnClickListener {
+            val input1 = if (numA.text.toString() != "") numA.text.toString().toInt() else 1;
+            val input2 = if (numB.text.toString() != "") numB.text.toString().toInt() else 1;
+            println("input1: " + numA.text.toString() + " input2: " + numB.text.toString());
+            val a = input1 % 10;
+            val b = input2 % 10;
+            val c = (input1 % 100 - a) % 10;
+            val d = (input1 % 100 - b) % 10;
+            val f: WaveFunction = object: WaveFunction() {
+                override fun f(x: Double): Double {
+                    val input1 = if (numA.text.toString() != "") numA.text.toString().toInt() else 1;
+                    val input2 = if (numB.text.toString() != "") numB.text.toString().toInt() else 1;
+                    val a = input1 % 10;
+                    val b = input2 % 10;
+                    val c = (input1 % 100 - a) % 10;
+                    val d = (input1 % 100 - b) % 10;
+                    return a * kotlin.math.sin(x + c / 10.0) + b * kotlin.math.cos( x - d / 100.0);
+                }
+            }
             Thread {
                 initTrack();
                 startPlaying();
-                playback();
+                playback(f);
             }.start();
         }
 
@@ -111,8 +138,8 @@ class SoundActivity : AppCompatActivity() {
         );
     }
 
-    private fun playback() {
-        val frameOut: ShortArray = ShortArray(buffLength);
+    private fun playback(wave: WaveFunction = object : WaveFunction(){}) {
+        var frameOut: ShortArray = ShortArray(buffLength);
         val amplitude: Int = 32767; // A
         val twoPi: Double = 2 * kotlin.math.PI;
         var phase: Double = 0.0;
@@ -120,13 +147,33 @@ class SoundActivity : AppCompatActivity() {
         while(isPlaying) {
             for (i in 0 until buffLength) {
                 // Asin(2πf / Fs)
-                frameOut[i] = (amplitude * kotlin.math.sin(phase)).toShort();
+                // 振幅はまだ
+                frameOut[i] = (wave.f(phase)).toShort();
+
                 phase += twoPi * frequency / Fs;
                 if (phase > twoPi) { // make sure: 0 <= phase <= 2pi
                     phase -= twoPi;
                 }
             }
-            Track.write(frameOut, 0, buffLength);
+            val max = frameOut.map {x -> kotlin.math.abs(x.toInt())}.max() ?: 1;
+            if (max != 0) {
+                for (i in 0 until buffLength) frameOut[i] = (amplitude / max * frameOut[i]).toShort();
+            } else {
+                frameOut = ShortArray(buffLength);
+            }
+            try {
+                Track.write(frameOut, 0, buffLength);
+            } catch (e: Exception) {
+                //Nothing
+                println("Failed to write to Track");
+            }
+        }
+
+    }
+
+    abstract class WaveFunction {
+        open fun f(x: Double): Double {
+            return kotlin.math.sin(x);
         }
     }
 
@@ -143,8 +190,8 @@ class SoundActivity : AppCompatActivity() {
         }
     }
 
-    private fun startPreviousActivity() {
-        val nextIntent = Intent(this, MainActivity::class.java);
+    private fun startNextActivity() {
+        val nextIntent = Intent(this, WaveActivity::class.java);
         startActivity(nextIntent);
     }
 }
