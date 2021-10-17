@@ -97,6 +97,18 @@ class SoundActivity : AppCompatActivity() {
 //            val transaction = supportFragmentManager.beginTransaction();
 //            transaction.add(R.id.layout, fragment);
 //            transaction.commit();
+
+            val fTmp = object: WaveFunction() {
+                override fun f(x: Double): Double {
+                    val n = if (numA.text.toString() != "") numA.text.toString().toInt() else 1;
+                    var result = 0.0;
+                    for (k in 1..n) { // sigma
+                        result +=
+                            4.0 / ((2 * k - 1) * kotlin.math.PI) * kotlin.math.sin((2 * k - 1) * x);
+                    }
+                    return result;
+                }
+            };
         }
 
         btnPlay.setOnClickListener {
@@ -117,11 +129,29 @@ class SoundActivity : AppCompatActivity() {
                     val d = (input1 % 100 - b) % 10;
                     return a * kotlin.math.sin(x + c / 10.0) + b * kotlin.math.cos( x - d / 100.0);
                 }
+            };
+
+            val fTmp = object: WaveFunction() {
+                override fun f(x: Double): Double {
+                    val n = if (numA.text.toString() != "") numA.text.toString().toInt() else 1;
+                    var result = 0.0;
+                    for (k in 1..n) { // sigma
+                        result +=
+                        4.0 / ((2 * k - 1) * kotlin.math.PI) * kotlin.math.sin((2 * k - 1) * x);
+                    }
+                    return result;
+                }
+            };
+
+            val fTmp2 = object: WaveFunction() {
+                override fun f(x: Double): Double {
+                    return if (kotlin.math.sin(x) > 0) 0.99999 else 9.9999;
+                }
             }
             Thread {
                 initTrack();
                 startPlaying();
-                playback(f);
+                playback(fTmp2);
             }.start();
         }
 
@@ -161,6 +191,7 @@ class SoundActivity : AppCompatActivity() {
             } else {
                 frameOut = ShortArray(buffLength);
             }
+
             try {
                 Track.write(frameOut, 0, buffLength);
             } catch (e: Exception) {
